@@ -4,10 +4,10 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=96
+        max_length=256
     )
     slug = models.SlugField(
-        max_length=96,
+        max_length=50,
         unique=True
     )
 
@@ -22,10 +22,10 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=96
+        max_length=256
     )
     slug = models.SlugField(
-        max_length=96,
+        max_length=50,
         unique=True
     )
 
@@ -40,7 +40,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=96
+        max_length=256
     )
     year = models.PositiveSmallIntegerField(
         verbose_name='Год'
