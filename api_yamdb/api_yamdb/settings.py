@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'reviews.apps.ReviewsConfig',
     'rest_framework',
     'django_filters',
+    'import_export',
 ]
 
 MIDDLEWARE = [
