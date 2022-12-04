@@ -5,9 +5,6 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 
-<<<<<<< HEAD
-# Create your views here.
-=======
 from .mixins import CreateListDestroyViewSet
 from .permissions import IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
