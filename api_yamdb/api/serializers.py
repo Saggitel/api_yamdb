@@ -1,10 +1,9 @@
-from reviews.models import Category, Comment, Genre, Review, Title
-from rest_framework import serializers
-from rest_framework_simplejwt.tokens import AccessToken
-from users.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
-from .send_email import send_code
+from rest_framework import serializers
+from rest_framework_simplejwt.tokens import AccessToken
+from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):

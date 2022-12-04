@@ -31,3 +31,6 @@ class User(AbstractUser):
         default='user',
         max_length=150,
     )
+
+    class Meta:
+        ordering = ('role',)
