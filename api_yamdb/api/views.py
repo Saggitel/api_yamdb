@@ -2,11 +2,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets, mixins
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from reviews.models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from users.models import ADMIN, User
 
 from .filters import TitleFilter
@@ -30,8 +30,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class GetPatchUserView(mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      viewsets.GenericViewSet):
+                       mixins.UpdateModelMixin,
+                       viewsets.GenericViewSet):
     serializer_class = UserSerializer
     permission_classes = (OwnerUserPermission,)
     queryset = User.objects.all()
@@ -48,9 +48,11 @@ class RegistrationView(APIView):
             username=serializer.validated_data.get('username'),
             email=serializer.validated_data.get('email')
         )
-        if not (request.user.is_authenticated
-            and (request.user.role == ADMIN
-                 or request.user.is_superuser)):
+        if not (
+            request.user.is_authenticated and (
+                request.user.role == ADMIN or request.user.is_superuser
+            )
+        ):
             confirmation_code = default_token_generator.make_token(user)
             send_code(user.email, confirmation_code)
         return Response(serializer.data, status=status.HTTP_200_OK)
