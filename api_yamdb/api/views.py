@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import ADMIN, User
 
+from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
 from .permissions import (AdminPermission, IsAdminOrReadOnly,
                           OwnerOrAdminPermission)
@@ -73,7 +74,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__name', 'genre__name', 'name', 'year')
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
