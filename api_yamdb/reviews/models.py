@@ -119,7 +119,7 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return f'{self.author} - {self.work}'
+        return f'{self.author} - {self.text}'
 
 
 class Comment(models.Model):
