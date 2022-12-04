@@ -46,7 +46,7 @@ class CreateTokenSerializer(serializers.Serializer):
         user = get_object_or_404(
             User, username=self.validated_data['username'])
         confirmation_code = self.validated_data['confirmation_code']
-     
+
         if default_token_generator.check_token(user, confirmation_code):
             return str(AccessToken.for_user(user))
 
