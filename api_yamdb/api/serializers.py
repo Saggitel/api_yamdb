@@ -88,14 +88,34 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
         read_only=True
     )
+    title = serializers.StringRelatedField(
+        read_only=True
+    )
 
     class Meta:
         fields = '__all__'
         model = Review
 
+    def validate(self, data):
+        if self.context['request'].method != 'POST':
+            return data
+        title = get_object_or_404(
+            Title,
+            pk=self.context['view'].kwargs.get('title_id')
+        )
+        author = self.context['request'].user
+        if Review.objects.filter(title_id=title, author=author).exists():
+            raise serializers.ValidationError(
+                'Нельзя оставлять более одного отзыва к произведению.'
+            )
+        return data
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
+        read_only=True
+    )
+    review = serializers.PrimaryKeyRelatedField(
         read_only=True
     )
 
