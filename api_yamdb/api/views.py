@@ -1,16 +1,15 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from reviews.models import Category, Genre, Title, Review, Comment
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from reviews.models import Category, Comment, Genre, Review, Title
+
 from .mixins import CreateListDestroyViewSet
 from .permissions import IsAdminOrReadOnly
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-from .serializers import (
-    CategorySerializer, GenreSerializer, TitleGETSerializer, TitleSerializer,
-    ReviewSerializer, CommentSerializer
-)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleGETSerializer, TitleSerializer)
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
@@ -27,15 +26,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    # необходимо добавить related_name для поля title в модели Review:
-    # title = models.ForeignKey(
-    #     Title,
-    #     on_delete=models.CASCADE,
-    #     related_name='reviews',
-    #     verbose_name='произведение'
-    # )
-    # также для модели Review, согласно Redoc, нужно поле score,
-    # с помощью которого будет формироваться рейтинг произведения (как среднее значение)
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__name', 'genre__name', 'name', 'year')
@@ -55,8 +45,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
-        queryset = title.reviews.all()
-        return queryset
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         serializer.save(
@@ -73,14 +62,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
-        queryset = review.comments.all()
-        return queryset
+        return review.comments.all()
 
     def perform_create(self, serializer):
         serializer.save(
             # Не уверен насчет 'or self.request.user.is_admin'
             author=self.request.user or self.request.user.is_admin, review_id=self.kwargs.get('post_id')
         )
-
-
-# class RatingViewSet(viewsets.ModelViewSet)
