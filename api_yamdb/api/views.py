@@ -9,7 +9,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .serializers import (
     CategorySerializer, GenreSerializer, TitleGETSerializer, TitleSerializer,
     ReviewSerializer, CommentSerializer
-
 )
 
 
@@ -17,16 +16,12 @@ class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
