@@ -7,43 +7,40 @@ from .send_email import send_code
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # username = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username',)
+    username = serializers.CharField(read_only=True)
+    email = serializers.EmailField(read_only=True)
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role',)
 
-    def create(self, validated_data):
-
-        return User.objects.get_or_create(
-            email=validated_data['email'],
-            username=validated_data['username'],
-        )
-
 
 class RegistrationSerializer(serializers.Serializer):
-    username = serializers.SlugField()
+    username = serializers.CharField()
     email = serializers.EmailField()
 
-    def save(self):
-        user = get_object_or_404(
-            User, username=self.validated_data['username'])
-        send_code(self.validated_data['email'],
-                  default_token_generator.make_token(user))
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('недопустимое имя пользователя')
+        return value
+
+    # def validate(self, data):
+    #     if (
+    #         User.objects.filter(email=data.get('email')).exists()
+    #         or User.objects.filter(username=data.get('username')).exists()
+    #     ):
+    #         raise serializers.ValidationError('Такой email уже существует')
 
 
-class SignupSerializer(serializers.Serializer):
-    username = serializers.SlugField()
-    confirmation_code = serializers.CharField()
+class CreateTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    confirmation_code = serializers.CharField(write_only=True)
+    token = serializers.SerializerMethodField()
 
-    # class Meta:
-    #     fields = ('username', 'confirmation_code',)
-
-    def save(self):
+    def get_token(self, obj):
         user = get_object_or_404(
             User, username=self.validated_data['username'])
         confirmation_code = self.validated_data['confirmation_code']
-        print(confirmation_code)
         if default_token_generator.check_token(user, confirmation_code):
-            return {'token': str(AccessToken.for_user(user))}
+            return str(AccessToken.for_user(user))
