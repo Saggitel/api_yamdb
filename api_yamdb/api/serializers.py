@@ -7,8 +7,8 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(read_only=True)
-    email = serializers.EmailField(read_only=True)
+    username = serializers.CharField()
+    email = serializers.EmailField()
 
     class Meta:
         model = User

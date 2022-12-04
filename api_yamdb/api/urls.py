@@ -23,10 +23,10 @@ router_v1.register(
     basename='comments'
 )
 router_v1.register(r'users', UserViewSet, basename='users')
+router_v1.register(r'users/me', GetPatchUserView, basename='user')
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
-    path('v1/auth/token/', CreateTokenView, name='create_token'),
-    path('v1/auth/signup/', RegistrationView, name='registration'),
-    path('v1/users/me/', GetPatchUserView, name='userprofile'),
+    path('v1/auth/token/', CreateTokenView.as_view(), name='create_token'),
+    path('v1/auth/signup/', RegistrationView.as_view(), name='registration'),
 ]

@@ -40,14 +40,11 @@ class AdminPermission(permissions.BasePermission):
 
 
 class OwnerUserPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method != 'PUT'
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.user.is_authenticated
-            and (request.user.role == ADMIN
-                 or request.user.is_superuser
-                 or obj == request.user)
-        )
+        return obj == request.user
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):

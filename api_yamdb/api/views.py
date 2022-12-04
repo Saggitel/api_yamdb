@@ -32,6 +32,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class GetPatchUserView(mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
                       viewsets.GenericViewSet):
+    serializer_class = UserSerializer
     permission_classes = (OwnerUserPermission,)
     queryset = User.objects.all()
 
