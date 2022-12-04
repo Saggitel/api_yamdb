@@ -1,33 +1,8 @@
 from rest_framework import permissions
-from users.models import ADMIN, MODERATOR, USER
-
-
-class UserPermission(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.role == USER
-        )
-
-    def has_object_permission(self, request, view, obj):
-        return True  # доделать
-
-
-class ModeratorPermission(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.role == MODERATOR
-        )
-
-    def has_object_permission(self, request, view, obj):
-        return True  # доделать
+from users.models import ADMIN, MODERATOR
 
 
 class AdminPermission(permissions.BasePermission):
-
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated

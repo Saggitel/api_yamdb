@@ -34,14 +34,19 @@ class RegistrationSerializer(serializers.Serializer):
 
 
 class CreateTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(write_only=True)
-    confirmation_code = serializers.CharField(write_only=True)
+    username = serializers.CharField(
+        write_only=True
+    )
+    confirmation_code = serializers.CharField(
+        write_only=True
+    )
     token = serializers.SerializerMethodField()
 
     def get_token(self, obj):
         user = get_object_or_404(
             User, username=self.validated_data['username'])
         confirmation_code = self.validated_data['confirmation_code']
+     
         if default_token_generator.check_token(user, confirmation_code):
             return str(AccessToken.for_user(user))
 
@@ -59,9 +64,16 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleGETSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True, read_only=True)
-    category = CategorySerializer(read_only=True)
-    rating = serializers.IntegerField(read_only=True)
+    genre = GenreSerializer(
+        many=True,
+        read_only=True
+    )
+    category = CategorySerializer(
+        read_only=True
+    )
+    rating = serializers.IntegerField(
+        read_only=True
+    )
 
     class Meta:
         model = Title
