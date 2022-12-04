@@ -69,4 +69,3 @@ class CommentViewSet(viewsets.ModelViewSet):
             # Не уверен насчет 'or self.request.user.is_admin'
             author=self.request.user or self.request.user.is_admin, review_id=self.kwargs.get('post_id')
         )
->>>>>>> develop
