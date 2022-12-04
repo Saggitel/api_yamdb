@@ -1,6 +1,8 @@
 from django.db import models
 
 
+User = get_user_model()
+
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Название',
@@ -72,3 +74,58 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Review(models.Model):
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='review'
+    )
+    text = models.CharField(
+        verbose_name='Текст', 
+        max_length=256,
+    )
+    title = models.ForeignKey(
+        Title, 
+        on_delete=models.CASCADE, 
+        verbose_name='произведение')
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return f'{self.author} - {self.work}'
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='comments'
+    )
+    text = models.TextField(
+        'Текст', 
+        max_length=256,
+    )
+    review = models.ForeignKey(
+        Review, 
+        on_delete=models.CASCADE, 
+        related_name='comments'
+    )
+    created = models.DateTimeField(
+        'Дата добавления', 
+        auto_now_add=True, 
+        db_index=True
+    )
+
+    class Meta:
+        verbose_name = 'Коментарий'
+        verbose_name_plural = 'Коментарии'
+
+    def __str__(self):
+        return f'{self.author} - {self.text}'
+
+
+# class Rating(models.Model):
