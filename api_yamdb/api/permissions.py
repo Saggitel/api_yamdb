@@ -39,7 +39,7 @@ class AdminPermission(permissions.BasePermission):
         return True
 
 
-class OwnerOrAdminPermission(permissions.BasePermission):
+class OwnerUserPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return (

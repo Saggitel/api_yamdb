@@ -2,7 +2,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, status, viewsets, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +12,7 @@ from users.models import ADMIN, User
 from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
 from .permissions import (AdminPermission, IsAdminOrReadOnly,
-                          OwnerOrAdminPermission)
+                          OwnerUserPermission)
 from .send_email import send_code
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateTokenSerializer, GenreSerializer,
@@ -22,11 +22,18 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
-    permission_classes = (OwnerOrAdminPermission,)
+    permission_classes = (AdminPermission,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+
+
+class GetPatchUserView(mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      viewsets.GenericViewSet):
+    permission_classes = (OwnerUserPermission,)
+    queryset = User.objects.all()
 
 
 class RegistrationView(APIView):
