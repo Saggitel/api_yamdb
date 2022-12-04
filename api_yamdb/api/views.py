@@ -93,10 +93,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            # Не уверен насчет 'or self.request.user.is_admin'
-            author=self.request.user or self.request.user.is_admin, title_id=self.kwargs.get('post_id')
-        )
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        user_comments = title.reviews.filter(user=self.request.user)
+        if user_comments.objects.count() < 1:
+            serializer.save(
+                # Не уверен насчет 'or self.request.user.is_admin'
+                author=self.request.user or self.request.user.is_admin, title_id=self.kwargs.get('post_id')
+            )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
