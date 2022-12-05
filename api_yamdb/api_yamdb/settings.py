@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwtdjango_filters'
     'django_filters',
     'import_export',
-    
 ]
 
 MIDDLEWARE = [
