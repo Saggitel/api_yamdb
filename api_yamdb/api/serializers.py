@@ -6,9 +6,16 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 
+def validate_unique(value):
+    if User.objects.filter(email=value).exists():
+        raise serializers.ValidationError('Такой email уже существует')
+    if User.objects.filter(username=value).exists():
+        raise serializers.ValidationError('Такой username уже существует')
+
+
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
-    email = serializers.EmailField()
+    username = serializers.CharField(validators=(validate_unique, ))
+    email = serializers.EmailField(validators=(validate_unique, ))
 
     class Meta:
         model = User
@@ -16,30 +23,19 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role',)
 
 
-class RegistrationSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    email = serializers.EmailField()
+class SignUpSerializer(serializers.Serializer):
+    username = serializers.CharField(validators=(validate_unique, ))
+    email = serializers.EmailField(validators=(validate_unique, ))
 
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError('недопустимое имя пользователя')
         return value
 
-    # def validate(self, data):
-    #     if (
-    #         User.objects.filter(email=data.get('email')).exists()
-    #         or User.objects.filter(username=data.get('username')).exists()
-    #     ):
-    #         raise serializers.ValidationError('Такой email уже существует')
-
 
 class CreateTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(
-        write_only=True
-    )
-    confirmation_code = serializers.CharField(
-        write_only=True
-    )
+    username = serializers.CharField(write_only=True)
+    confirmation_code = serializers.CharField(write_only=True)
     token = serializers.SerializerMethodField()
 
     def get_token(self, obj):
@@ -49,6 +45,13 @@ class CreateTokenSerializer(serializers.Serializer):
 
         if default_token_generator.check_token(user, confirmation_code):
             return str(AccessToken.for_user(user))
+
+    def validate(self, data):
+        user = get_object_or_404(User, username=data['username'])
+        confirmation_code = data['confirmation_code']
+        if not default_token_generator.check_token(user, confirmation_code):
+            raise serializers.ValidationError('неверный проверочный код')
+        return data
 
 
 class CategorySerializer(serializers.ModelSerializer):
