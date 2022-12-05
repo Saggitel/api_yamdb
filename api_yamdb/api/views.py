@@ -16,7 +16,7 @@ from .permissions import (AdminPermission, IsAdminOrReadOnly,
 from .send_email import send_code
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateTokenSerializer, GenreSerializer,
-                          SignUpSerializer, ReviewSerializer,
+                          ReviewSerializer, SignUpSerializer,
                           TitleGETSerializer, TitleSerializer, UserSerializer)
 
 
