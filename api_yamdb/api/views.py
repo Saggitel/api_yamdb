@@ -40,13 +40,13 @@ class GetPatchUserViewSet(viewsets.ViewSet):
     def patch(self, request):
         serializer = UserSerializer(
             request.user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if not (request.user.is_admin
-                    or request.user.is_staff
-                    or request.user.is_superuser):
-                user = serializer.save(role=request.user.role)
-            else:
-                user = serializer.save()
+        serializer.is_valid(raise_exception=True)
+        if not (request.user.is_admin
+                or request.user.is_staff
+                or request.user.is_superuser):
+            user = serializer.save(role=request.user.role)
+        else:
+            user = serializer.save()
             return Response(UserSerializer(user).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
