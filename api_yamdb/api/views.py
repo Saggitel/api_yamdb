@@ -16,8 +16,8 @@ from .permissions import (AdminPermission, IsAdminOrReadOnly,
 from .send_email import send_code
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateTokenSerializer, GenreSerializer,
-                          ReviewSerializer, SignUpSerializer,
-                          TitleGETSerializer, TitleSerializer, UserSerializer)
+                          ReviewSerializer, TitleGETSerializer,
+                          TitleSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -33,11 +33,11 @@ class GetPatchUserViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        print(request.user)
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
+        print('!!!', AdminPermission)
         serializer = UserSerializer(
             request.user, data=request.data, partial=True)
         if serializer.is_valid():
@@ -53,12 +53,11 @@ class SignUpView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        serializer = SignUpSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         user, created = User.objects.get_or_create(
-            username=serializer.validated_data.get('username'),
-            email=serializer.validated_data.get('email')
+            username=serializer.data.get('username'),
+            email=serializer.data.get('email')
         )
         confirmation_code = default_token_generator.make_token(user)
         send_code(user.email, confirmation_code)
@@ -70,9 +69,7 @@ class CreateTokenView(APIView):
 
     def post(self, request):
         serializer = CreateTokenSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
 
 class CategoryViewSet(CreateListDestroyViewSet):

@@ -14,18 +14,13 @@ def validate_unique(value):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(validators=(validate_unique, ))
-    email = serializers.EmailField(validators=(validate_unique, ))
+    username = serializers.CharField(validators=[validate_unique, ])
+    email = serializers.EmailField(validators=[validate_unique, ])
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role',)
-
-
-class SignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(validators=(validate_unique, ))
-    email = serializers.EmailField(validators=(validate_unique, ))
 
     def validate_username(self, value):
         if value == 'me':
@@ -42,7 +37,6 @@ class CreateTokenSerializer(serializers.Serializer):
         user = get_object_or_404(
             User, username=self.validated_data['username'])
         confirmation_code = self.validated_data['confirmation_code']
-
         if default_token_generator.check_token(user, confirmation_code):
             return str(AccessToken.for_user(user))
 

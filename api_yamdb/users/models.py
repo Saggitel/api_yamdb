@@ -15,11 +15,13 @@ class User(AbstractUser):
     password = models.CharField(
         'Пароль',
         max_length=50,
-        blank=True)
+        blank=True
+    )
     email = models.EmailField(
         'Электронная почта',
         blank=False,
         unique=True,
+        max_length=254,
     )
     bio = models.TextField(
         'Биография',
@@ -28,8 +30,8 @@ class User(AbstractUser):
     role = models.CharField(
         'Роль',
         choices=ROLE_CHOICES,
-        default='user',
-        max_length=150,
+        default=USER,
+        max_length=len(max([i[0] for i in ROLE_CHOICES], key=len)),
     )
 
     class Meta:
