@@ -1,17 +1,17 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-USER = 'user'
-MODERATOR = 'moderator'
-ADMIN = 'admin'
-
 
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
     ROLE_CHOICES = (
         (USER, 'Пользователь'),
         (MODERATOR, 'Модератор'),
         (ADMIN, 'Администратор'),
     )
+    MAX_LENGTH_ROLE = len(max([i[0] for i in ROLE_CHOICES], key=len))
     username = models.SlugField(
         'Юзернейм',
         blank=False,
@@ -49,8 +49,20 @@ class User(AbstractUser):
         'Роль',
         choices=ROLE_CHOICES,
         default=USER,
-        max_length=len(max([i[0] for i in ROLE_CHOICES], key=len)),
+        max_length=MAX_LENGTH_ROLE,
     )
+
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    def is_moderator(self):
+        return self.role == self.MODERATOR
+
+    def is_user(self):
+        return self.role == self.USER
+
+    # def max_role_length(self):
+    #     return len(max([i[0] for i in self.ROLE_CHOICES], key=len))
 
     class Meta:
         ordering = ('role',)

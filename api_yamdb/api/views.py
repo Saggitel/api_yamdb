@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from reviews.models import Category, Genre, Review, Title
-from users.models import ADMIN, User
+from users.models import User
 
 from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
@@ -40,7 +40,9 @@ class GetPatchUserViewSet(viewsets.ViewSet):
         serializer = UserSerializer(
             request.user, data=request.data, partial=True)
         if serializer.is_valid():
-            if request.user.role != ADMIN:
+            if not (request.user.is_admin()
+                    or request.user.is_staff
+                    or request.user.is_superuser):
                 user = serializer.save(role=request.user.role)
             else:
                 user = serializer.save()
@@ -70,6 +72,7 @@ class CreateTokenView(APIView):
         serializer = CreateTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
