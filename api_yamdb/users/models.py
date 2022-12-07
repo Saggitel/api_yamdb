@@ -71,5 +71,14 @@ class User(AbstractUser):
     def is_user(self):
         return self.role == self.USER
 
+    @property
+    def is_privelaged(self):
+        return (
+            self.is_moderator
+            or self.is_admin
+            or self.is_staff
+            or self.is_superuser
+        )
+
     class Meta:
         ordering = ('role',)
