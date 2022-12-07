@@ -22,7 +22,6 @@ router_v1.register(
     CommentViewSet,
     basename='comments'
 )
-# router_v1.register('users/me', GetPatchUserViewSet, basename='me')
 router_v1.register('users', UserViewSet, basename='users')
 
 urlpatterns = [

@@ -1,4 +1,5 @@
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import AccessToken
@@ -6,35 +7,36 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 
-def validate_unique(value):
-    if User.objects.filter(email=value).exists():
-        raise serializers.ValidationError('Такой email уже существует')
-    if User.objects.filter(username=value).exists():
-        raise serializers.ValidationError('Такой username уже существует')
+def validate_username(value):
+    if value == 'me':
+        raise serializers.ValidationError('недопустимое имя пользователя')
+    return value
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(validators=(validate_unique, ))
-    email = serializers.EmailField(validators=(validate_unique, ))
+    username = serializers.SlugField(max_length=150,
+                                     validators=(validate_username, ))
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role',)
 
-
-class SignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(validators=(validate_unique, ))
-    email = serializers.EmailField(validators=(validate_unique, ))
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('недопустимое имя пользователя')
-        return value
+    def validate(self, data):
+        if User.objects.filter(email=data.get('email'),
+                               username=data.get('username')).exists():
+            return data
+        if User.objects.filter(Q(email=data.get('email'))
+                               | Q(username=data.get('username'))).exists():
+            raise serializers.ValidationError(
+                {'user': 'Такой пользователь уже существует'})
+        return data
 
 
 class CreateTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(write_only=True)
+    username = serializers.SlugField(write_only=True,
+                                     max_length=150,
+                                     validators=(validate_username, ))
     confirmation_code = serializers.CharField(write_only=True)
     token = serializers.SerializerMethodField()
 
@@ -42,7 +44,6 @@ class CreateTokenSerializer(serializers.Serializer):
         user = get_object_or_404(
             User, username=self.validated_data['username'])
         confirmation_code = self.validated_data['confirmation_code']
-
         if default_token_generator.check_token(user, confirmation_code):
             return str(AccessToken.for_user(user))
 
@@ -50,7 +51,8 @@ class CreateTokenSerializer(serializers.Serializer):
         user = get_object_or_404(User, username=data['username'])
         confirmation_code = data['confirmation_code']
         if not default_token_generator.check_token(user, confirmation_code):
-            raise serializers.ValidationError('неверный проверочный код')
+            raise serializers.ValidationError(
+                {'confirmation_code': 'неверный проверочный код'})
         return data
 
 
