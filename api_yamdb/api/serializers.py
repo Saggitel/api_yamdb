@@ -44,7 +44,7 @@ class CreateTokenSerializer(serializers.Serializer):
         user = get_object_or_404(User, username=data['username'])
         confirmation_code = data['confirmation_code']
         if not default_token_generator.check_token(user, confirmation_code):
-            raise serializers.ValidationError('неверный проверочный код')
+            raise serializers.ValidationError({'confirmation_code': 'неверный проверочный код'})
         return data
 
 

@@ -70,7 +70,7 @@ class CreateTokenView(APIView):
     def post(self, request):
         serializer = CreateTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
