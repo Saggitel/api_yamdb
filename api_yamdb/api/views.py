@@ -11,7 +11,7 @@ from users.models import User
 
 from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
-from .permissions import (AdminPermission, IsAdminOrReadOnly,
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsUserAdminModeratorOrReadOnly)
 from .send_email import send_code
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -22,7 +22,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
-    permission_classes = (AdminPermission,)
+    permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
