@@ -40,7 +40,7 @@ class GetPatchUserViewSet(viewsets.ViewSet):
         serializer = UserSerializer(
             request.user, data=request.data, partial=True)
         if serializer.is_valid():
-            if not (request.user.is_admin()
+            if not (request.user.is_admin
                     or request.user.is_staff
                     or request.user.is_superuser):
                 user = serializer.save(role=request.user.role)

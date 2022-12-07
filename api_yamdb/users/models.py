@@ -11,7 +11,7 @@ class User(AbstractUser):
         (MODERATOR, 'Модератор'),
         (ADMIN, 'Администратор'),
     )
-    MAX_LENGTH_ROLE = len(max([i[0] for i in ROLE_CHOICES], key=len))
+    MAX_ROLE_LENGTH = len(max([i[0] for i in ROLE_CHOICES], key=len))
     username = models.SlugField(
         'Юзернейм',
         blank=False,
@@ -49,20 +49,24 @@ class User(AbstractUser):
         'Роль',
         choices=ROLE_CHOICES,
         default=USER,
-        max_length=MAX_LENGTH_ROLE,
+        max_length=MAX_ROLE_LENGTH,
     )
 
+    @property
     def is_admin(self):
         return self.role == self.ADMIN
 
+    @property
     def is_moderator(self):
         return self.role == self.MODERATOR
 
+    @property
     def is_user(self):
         return self.role == self.USER
 
-    # def max_role_length(self):
-    #     return len(max([i[0] for i in self.ROLE_CHOICES], key=len))
+
+
+
 
     class Meta:
         ordering = ('role',)
