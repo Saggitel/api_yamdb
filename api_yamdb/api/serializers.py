@@ -23,9 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role',)
 
     def validate(self, data):
-        if User.objects.filter(email=data.get('email'),
-                               username=data.get('username')).exists():
-            return data
         if User.objects.filter(Q(email=data.get('email'))
                                | Q(username=data.get('username'))).exists():
             raise serializers.ValidationError(
