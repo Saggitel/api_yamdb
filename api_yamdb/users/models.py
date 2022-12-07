@@ -12,6 +12,24 @@ class User(AbstractUser):
         (MODERATOR, 'Модератор'),
         (ADMIN, 'Администратор'),
     )
+    username = models.SlugField(
+        'Юзернейм',
+        blank=False,
+        unique=True,
+        max_length=150,
+    )
+    first_name = models.CharField(
+        'Имя',
+        blank=True,
+        unique=False,
+        max_length=150,
+    )
+    last_name = models.CharField(
+        'Фамилия',
+        blank=True,
+        unique=False,
+        max_length=150,
+    )
     password = models.CharField(
         'Пароль',
         max_length=50,
