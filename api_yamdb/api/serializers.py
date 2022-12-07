@@ -1,5 +1,5 @@
-from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import AccessToken
