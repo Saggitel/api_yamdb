@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (CategoryViewSet, CommentViewSet, CreateTokenView,
-                    GenreViewSet, GetPatchUserViewSet, ReviewViewSet,
+                    GenreViewSet, RetrieveUpdateUserView, ReviewViewSet,
                     SignUpView, TitleViewSet, UserViewSet)
 
 app_name = 'api'
@@ -26,7 +26,7 @@ router_v1.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('v1/users/me/',
-         GetPatchUserViewSet.as_view({'get': 'get', 'patch': 'patch'}),
+         RetrieveUpdateUserView.as_view(),
          name='me'
          ),
     path('v1/', include(router_v1.urls)),
