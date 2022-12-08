@@ -2,7 +2,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, status, viewsets, generics
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -30,25 +30,21 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
 
 
-class GetPatchUserViewSet(viewsets.ViewSet):
+class RetrieveUpdateUserView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-    def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_object(self):
+        return get_object_or_404(User, username=self.request.user.username)
 
-    def patch(self, request):
-        serializer = UserSerializer(
-            request.user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if not (request.user.is_admin
-                    or request.user.is_staff
-                    or request.user.is_superuser):
-                user = serializer.save(role=request.user.role)
-            else:
-                user = serializer.save()
-            return Response(UserSerializer(user).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_update(self, serializer):
+        if (self.request.user.is_admin
+            or self.request.user.is_staff
+                or self.request.user.is_superuser):
+            serializer.save()
+        else:
+            serializer.save(role=self.request.user.role)
 
 
 class SignUpView(APIView):
